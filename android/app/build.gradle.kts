@@ -28,6 +28,9 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders += mapOf(
+        "GOOGLE_MAPS_API_KEY" to getApiKey()
+    )
     }
 
     buildTypes {
@@ -41,4 +44,14 @@ android {
 
 flutter {
     source = "../.."
+}
+
+fun getApiKey(): String {
+    val properties = java.util.Properties()
+    val localProperties = File(project.rootDir.parentFile, "local.properties")
+    if (localProperties.exists()) {
+        properties.load(java.io.FileInputStream(localProperties))
+        return properties.getProperty("GOOGLE_MAPS_API_KEY") ?: ""
+    }
+    return ""
 }
