@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'core/di/service_locator.dart' as di;
 import 'core/environments/environment_config.dart';
+import 'presentation/pages/cluster_map_page.dart';
 import 'presentation/pages/map_page.dart';
 
 void main() async {
@@ -49,7 +50,49 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           useMaterial3: true,
         ),
-        home: const MapPage(),
+        home: const HomePage(),
+      ),
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Map Demo'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MapPage()),
+                );
+              },
+              child: const Text('Standard Map'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ClusterMapPage(),
+                  ),
+                );
+              },
+              child: const Text('Clustered Map'),
+            ),
+          ],
+        ),
       ),
     );
   }
