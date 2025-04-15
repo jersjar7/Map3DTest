@@ -1,3 +1,12 @@
+#!/bin/bash
+
+# Navigate to project directory
+cd "$(dirname "$0")"
+
+echo "Updating iOS deployment target to 14.0..."
+
+# Update Podfile
+cat > ios/Podfile << 'EOL'
 platform :ios, '14.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
@@ -56,3 +65,31 @@ post_install do |installer|
     end
   end
 end
+EOL
+
+# Update project.pbxproj
+echo "Updating project.pbxproj..."
+sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = 12.0;/IPHONEOS_DEPLOYMENT_TARGET = 14.0;/g' ios/Runner.xcodeproj/project.pbxproj
+sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = 13.4;/IPHONEOS_DEPLOYMENT_TARGET = 14.0;/g' ios/Runner.xcodeproj/project.pbxproj
+sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = 16.6;/IPHONEOS_DEPLOYMENT_TARGET = 14.0;/g' ios/Runner.xcodeproj/project.pbxproj
+
+# Also update AppFrameworkInfo.plist
+echo "Updating AppFrameworkInfo.plist..."
+sed -i '' 's/<string>12.0<\/string>/<string>14.0<\/string>/g' ios/Flutter/AppFrameworkInfo.plist
+
+# Clean up
+echo "Cleaning up..."
+rm -rf ios/Pods ios/Podfile.lock
+rm -rf build/ .dart_tool/
+
+# Install pods
+echo "Installing pods..."
+cd ios
+pod install --repo-update
+cd ..
+
+# Get packages
+echo "Getting packages..."
+flutter pub get
+
+echo "Setup completed. Now try running: flutter run"

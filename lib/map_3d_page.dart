@@ -1,6 +1,9 @@
+// In lib/map_3d_page.dart, update your existing code:
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'database_helper.dart';
+import 'mapbox_page.dart'; // Add this import for the MapBox page
 
 class Map3DPage extends StatefulWidget {
   const Map3DPage({super.key});
@@ -289,28 +292,89 @@ class _Map3DPageState extends State<Map3DPage> {
     return colors[colorIndex];
   }
 
+  // NEW METHOD: Show map type selector bottom sheet
+  void _showMapTypeSelector() {
+    showModalBottomSheet(
+      context: context,
+      builder:
+          (context) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.map),
+                title: const Text('Standard'),
+                onTap: () {
+                  setState(() => _currentMapType = MapType.normal);
+                  Navigator.pop(context);
+                },
+                selected: _currentMapType == MapType.normal,
+              ),
+              ListTile(
+                leading: const Icon(Icons.satellite),
+                title: const Text('Satellite'),
+                onTap: () {
+                  setState(() => _currentMapType = MapType.satellite);
+                  Navigator.pop(context);
+                },
+                selected: _currentMapType == MapType.satellite,
+              ),
+              ListTile(
+                leading: const Icon(Icons.terrain),
+                title: const Text('Terrain'),
+                onTap: () {
+                  setState(() => _currentMapType = MapType.terrain);
+                  Navigator.pop(context);
+                },
+                selected: _currentMapType == MapType.terrain,
+              ),
+              ListTile(
+                leading: const Icon(Icons.layers),
+                title: const Text('Hybrid'),
+                onTap: () {
+                  setState(() => _currentMapType = MapType.hybrid);
+                  Navigator.pop(context);
+                },
+                selected: _currentMapType == MapType.hybrid,
+              ),
+            ],
+          ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Rivr 3D Map Test'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed:
-                _currentZoom >= _minZoomForMarkers
-                    ? _loadStationsInVisibleRegion
-                    : null,
-            tooltip: 'Refresh stations',
-          ),
-          IconButton(
-            icon: const Icon(Icons.layers),
-            onPressed: _toggleMapType,
-            tooltip: 'Toggle map type',
-          ),
-        ],
-      ),
+      // appBar: AppBar(
+      //   title: const Text('Rivr 3D Map Test'),
+      //   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      //   actions: [
+      //     IconButton(
+      //       icon: const Icon(Icons.refresh),
+      //       onPressed:
+      //           _currentZoom >= _minZoomForMarkers
+      //               ? _loadStationsInVisibleRegion
+      //               : null,
+      //       tooltip: 'Refresh stations',
+      //     ),
+      //     // UPDATED: Changed the layers button to call _showMapTypeSelector()
+      //     IconButton(
+      //       icon: const Icon(Icons.layers),
+      //       onPressed: _showMapTypeSelector,
+      //       tooltip: 'Change map type',
+      //     ),
+      //     // NEW: Added a compare button to navigate to the Mapbox page
+      //     IconButton(
+      //       icon: const Icon(Icons.compare),
+      //       onPressed: () {
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => const MapboxPage()),
+      //         );
+      //       },
+      //       tooltip: 'Compare with Mapbox',
+      //     ),
+      //   ],
+      // ),
       body: Stack(
         children: [
           GoogleMap(
@@ -390,6 +454,11 @@ class _Map3DPageState extends State<Map3DPage> {
                         'Loaded in ${_loadDuration!.inMilliseconds}ms',
                         style: TextStyle(fontSize: 12, color: Colors.grey[700]),
                       ),
+                    // NEW: Added label for current map type
+                    Text(
+                      'Map type: ${_currentMapType.toString().split('.').last}',
+                      style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                    ),
                   ],
                 ),
               ),
@@ -467,15 +536,15 @@ class _Map3DPageState extends State<Map3DPage> {
     }
   }
 
-  // Toggle between map styles
-  void _toggleMapType() {
-    setState(() {
-      _currentMapType =
-          _currentMapType == MapType.normal
-              ? MapType.satellite
-              : _currentMapType == MapType.satellite
-              ? MapType.terrain
-              : MapType.normal;
-    });
-  }
+  // REMOVED: This method is no longer needed as it's replaced by _showMapTypeSelector()
+  // void _toggleMapType() {
+  //   setState(() {
+  //     _currentMapType =
+  //         _currentMapType == MapType.normal
+  //             ? MapType.satellite
+  //             : _currentMapType == MapType.satellite
+  //             ? MapType.terrain
+  //             : MapType.normal;
+  //   });
+  // }
 }
